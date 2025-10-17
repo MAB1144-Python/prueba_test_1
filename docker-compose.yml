@@ -1,0 +1,135 @@
+services:
+  # Servicio principal del evaluador
+  website-evaluator:
+    build: .
+    container_name: website-evaluator
+    volumes:
+      - ./screenshots:/home/evaluator/app/screenshots
+      - ./reports:/home/evaluator/app/reports
+      - ./credentials:/home/evaluator/app/credentials
+      - ./logs:/home/evaluator/app/logs
+      - ./.env:/home/evaluator/app/.env
+    environment:
+      - DISPLAY=:99
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - evaluator-network
+    profiles:
+      - full
+    command: python main.py https://www.google.com
+
+  # Servicio web API (futuro)
+  web-api:
+    build: .
+    container_name: evaluator-web-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./screenshots:/home/evaluator/app/screenshots
+      - ./reports:/home/evaluator/app/reports
+      - ./credentials:/home/evaluator/app/credentials
+      - ./.env:/home/evaluator/app/.env
+    environment:
+      - DISPLAY=:99
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - evaluator-network
+    profiles:
+      - api
+    command: python -c "print('API Web no implementada aún')"
+
+  # Redis para cache y cola de trabajos
+  redis:
+    image: redis:7-alpine
+    container_name: evaluator-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - evaluator-network
+    profiles:
+      - full
+      - api
+
+  # MongoDB para persistencia
+  mongodb:
+    image: mongo:6
+    container_name: evaluator-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=evaluator
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+      - MONGO_INITDB_DATABASE=website_evaluations
+    volumes:
+      - mongodb-data:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - evaluator-network
+    profiles:
+      - full
+      - api
+
+  # Jupyter Notebook para análisis
+  jupyter:
+    build: .
+    container_name: evaluator-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/home/evaluator/app
+      - ./notebooks:/home/evaluator/notebooks
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    networks:
+      - evaluator-network
+    profiles:
+      - dev
+    command: >
+      bash -c "pip install --user jupyter jupyterlab pandas matplotlib seaborn &&
+               jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root 
+               --NotebookApp.token='' --NotebookApp.password=''"
+
+  # Servicio de monitoreo
+  monitoring:
+    image: prom/prometheus:latest
+    container_name: evaluator-monitoring
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - evaluator-network
+    profiles:
+      - monitoring
+
+  # Dashboard de métricas
+  grafana:
+    image: grafana/grafana:latest
+    container_name: evaluator-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - evaluator-network
+    profiles:
+      - monitoring
+
+volumes:
+  redis-data:
+  mongodb-data:
+  grafana-data:
+
+networks:
+  evaluator-network:
+    driver: bridge
