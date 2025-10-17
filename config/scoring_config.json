@@ -1,0 +1,57 @@
+{
+  "scoring_weights": {
+    "typography": {
+      "weight": 0.25,
+      "criteria": {
+        "readability": 0.4,
+        "font_size": 0.2,
+        "contrast": 0.25,
+        "hierarchy": 0.15
+      }
+    },
+    "color": {
+      "weight": 0.20,
+      "criteria": {
+        "harmony": 0.5,
+        "accessibility": 0.5
+      }
+    },
+    "layout": {
+      "weight": 0.25,
+      "criteria": {
+        "structure": 0.4,
+        "whitespace": 0.3,
+        "alignment": 0.3
+      }
+    },
+    "usability": {
+      "weight": 0.20,
+      "criteria": {
+        "navigation": 0.4,
+        "loading_speed": 0.2,
+        "mobile_responsiveness": 0.4
+      }
+    },
+    "modern_design": {
+      "weight": 0.10,
+      "criteria": {
+        "trends": 0.5,
+        "innovation": 0.5
+      }
+    }
+  },
+  "score_ranges": {
+    "excellent": {"min": 90, "max": 100, "color": "#4CAF50"},
+    "very_good": {"min": 80, "max": 89, "color": "#8BC34A"},
+    "good": {"min": 70, "max": 79, "color": "#FFC107"},
+    "fair": {"min": 60, "max": 69, "color": "#FF9800"},
+    "poor": {"min": 0, "max": 59, "color": "#F44336"}
+  },
+  "analysis_prompts": {
+    "typography": "Analiza la tipografía de esta página web. Evalúa: legibilidad del texto, tamaño de fuente apropiado, contraste entre texto y fondo, y jerarquía tipográfica clara. Proporciona una puntuación de 0-100 y explicaciones detalladas.",
+    "color": "Evalúa el esquema de colores de esta página web. Considera: armonía de colores, accesibilidad (contraste suficiente), y coherencia cromática. Proporciona una puntuación de 0-100 y recomendaciones específicas.",
+    "layout": "Analiza el diseño y layout de esta página web. Evalúa: estructura clara, uso efectivo del espacio en blanco, alineación de elementos, y organización visual. Proporciona una puntuación de 0-100 y sugerencias de mejora.",
+    "usability": "Evalúa la usabilidad de esta página web. Considera: facilidad de navegación, tiempo de carga aparente, responsive design, y experiencia del usuario. Proporciona una puntuación de 0-100 y recomendaciones prácticas.",
+    "modern_design": "Analiza qué tan moderno y actualizado es el diseño de esta página web. Evalúa: tendencias actuales de diseño, innovación visual, y apariencia contemporánea. Proporciona una puntuación de 0-100."
+  }
+}
